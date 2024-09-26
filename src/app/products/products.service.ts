@@ -1,14 +1,22 @@
-import { Injectable } from "@nestjs/common";
-
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { ProductsEntity } from "src/entities/products.entity";
+import { Repository } from "typeorm";
+import { CreateProductsDTO } from "./productsDTO/products.dto";
+import { CustomException } from "src/utils/customException";
 @Injectable()
 export class ProductsService {
-  private readonly products: Products[] = [];
+  constructor(
+    @InjectRepository(ProductsEntity)
+    private readonly products: Repository<ProductsEntity>,
+  ) {}
 
-  create(products: Products) {
-    this.products.push(products);
+  async findAll(): Promise<any> {
+    return this.products.find();
   }
 
-  findAll(): Products[] {
-    return this.products;
+  async createProducts(createProducts: CreateProductsDTO): Promise<any> {
+    const create = this.products.create({});
+    return await this.products.save(create);
   }
 }
